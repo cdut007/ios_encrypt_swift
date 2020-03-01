@@ -290,7 +290,7 @@ char* decryptMessage2(const char* encryptMsg ,const char* senderName, const char
 
 
        // size_t decryptlen = 0;
-        unsigned char*   decode_content_origal = base64_decode(decode_content,decode_content_len,&orgLen);
+        char*   decode_content_origal = base64_decode(decode_content,decode_content_len,&orgLen);
        
         uint8_t * message = (uint8_t *)decode_content_origal;
         size_t alice_plain_content_len = orgLen;
@@ -311,13 +311,14 @@ char* decryptMessage2(const char* encryptMsg ,const char* senderName, const char
         size_t bob_plaintext_len = signal_buffer_len(bob_plaintext);
 
         /* in case you'd expect char buffer, just a byte to byte copy */
-    char* decryptedMsg = (char*)bob_plaintext_data;
+        char* decryptedMsg = (char*)bob_plaintext_data;
+        decryptedMsg[bob_plaintext_len]='\0';
         fprintf(stderr,"session_cipher_decrypt_signal_message,content,%s\n",decryptedMsg);
         //ck_assert_int_eq(memcmp(alice_plaintext, bob_plaintext_data, bob_plaintext_len), 0);
         fprintf(stderr,"Interaction complete: Alice -> Bob\n");
         char* content;
         content = append(decryptedMsg, "");
-    free(decode_content_origal);
+        free(decode_content_origal);
         SIGNAL_UNREF(alice_message_deserialized);
         signal_buffer_free(bob_plaintext);
         session_cipher_free(bob_cipher);
