@@ -59,7 +59,6 @@ public extension Signal {
         
          let info = SignalProtocol.encryptMsgMethod(convertUtf8Str(currentUser),convertUtf8Str(receiverName),convertUtf8Str(orignalMsg))
          let encryptedMsg =  String(cString: info!)
-        print("\(encryptedMsg)")
         
         return encryptedMsg
       }
@@ -73,8 +72,6 @@ public extension Signal {
 
             let info = SignalProtocol.decryptMsgMethod(convertUtf8Str(encryptMsg),convertUtf8Str(senderName),convertUtf8Str(decode_msg_content),convertUtf8Str(decode_session_key))
             let decryptMsg =  String(cString: info!)
-           print("\(decryptMsg)")
-           
            return decryptMsg
          }
        

@@ -93,7 +93,7 @@ char* decryptMessage2(const char* encryptMsg,const char* senderName,const char* 
 char* append(char *s1, char *s2);
 
 char* base64_encode(char* plain,size_t len);
-unsigned char * base64_decode(const unsigned char *src, size_t len,
+unsigned char* base64_decode(const unsigned char *src, size_t len,
                                 size_t *out_len);
  void initialize_sessions_v3(session_state *alice_state, session_state *bob_state, signal_context *global_context);
 

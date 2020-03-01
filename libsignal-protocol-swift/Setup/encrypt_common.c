@@ -176,7 +176,7 @@
              //content
              char *  encoded = base64_encode(encrypt_chars,len);
 
-             fprintf(stderr,"ciphertext_message_get_serialized content encoded:%s,len %d\n",encoded,len);
+           //  fprintf(stderr,"ciphertext_message_get_serialized content encoded:%s,len %d\n",encoded,len);
 
              //serialized the session record.
              signal_buffer *buffer = 0;
@@ -257,15 +257,17 @@ char* decryptMessage2(const char* encryptMsg ,const char* senderName, const char
 //                    }
               fprintf(stderr,"find session decode_content:%s decode_key:%s\n",decode_content, decode_key);
                 /* Deserialize the record */
-                char*  decode_content_origal,decode_key_origal;
+               
                 size_t orgLen=0,keyLen=0;
                 size_t decode_content_len = strlen(decode_content),decode_key_len=strlen(decode_key);
-                decode_content_origal = base64_decode(decode_content,decode_content_len,&orgLen);
-                decode_key_origal = base64_decode(decode_key,decode_key_len,&keyLen);
-
+               
+                unsigned char*  decode_key_origal = base64_decode(decode_key,decode_key_len,&keyLen);
+                fprintf(stderr,"ciphertext_message_get_serialized decode_key_origal:len %d\n",keyLen);
+               // char*  session_encoded = base64_encode(decode_key_origal,keyLen);
+               // fprintf(stderr,"ciphertext_message_get_base64_check_key_origal: %s\n",session_encoded);
                 session_record *record_deserialized = 0;
-                const char*  expr_session_record= decode_content;
-                uint8_t * data = (uint8_t *)expr_session_record;
+                //const char*  expr_session_record= decode_key_origal;
+                uint8_t * data = (uint8_t *)decode_key_origal;
 
 
                 result = session_record_deserialize(&record_deserialized, data, keyLen, global_context);
@@ -287,10 +289,11 @@ char* decryptMessage2(const char* encryptMsg ,const char* senderName, const char
         result = session_cipher_create(&bob_cipher, bob_store, &bob_address, global_context);
 
 
-        int decryptlen = orgLen;
-        const char*  expr= decode_content_origal;
-        uint8_t * message = (uint8_t *)expr;
-        size_t alice_plain_content_len = decryptlen;
+       // size_t decryptlen = 0;
+        unsigned char*   decode_content_origal = base64_decode(decode_content,decode_content_len,&orgLen);
+       
+        uint8_t * message = (uint8_t *)decode_content_origal;
+        size_t alice_plain_content_len = orgLen;
         fprintf(stderr," decrypt alice_plain_content_len,result:%d",alice_plain_content_len);
         signal_message *alice_message_deserialized = 0;
         result = signal_message_deserialize(&alice_message_deserialized,
@@ -302,17 +305,19 @@ char* decryptMessage2(const char* encryptMsg ,const char* senderName, const char
         signal_buffer *bob_plaintext = 0;
         result = session_cipher_decrypt_signal_message(bob_cipher, alice_message_deserialized, 0, &bob_plaintext);
         ////ck_assert_int_eq(result, 0);
-       fprintf(stderr,"session_cipher_decrypt_signal_message,result:%d",result);
+       fprintf(stderr,"session_cipher_decrypt_signal_message,result:%d\n",result);
 
         uint8_t *bob_plaintext_data = signal_buffer_data(bob_plaintext);
         size_t bob_plaintext_len = signal_buffer_len(bob_plaintext);
 
         /* in case you'd expect char buffer, just a byte to byte copy */
     char* decryptedMsg = (char*)bob_plaintext_data;
-        fprintf(stderr,"session_cipher_decrypt_signal_message,content,%s",decryptedMsg);
+        fprintf(stderr,"session_cipher_decrypt_signal_message,content,%s\n",decryptedMsg);
         //ck_assert_int_eq(memcmp(alice_plaintext, bob_plaintext_data, bob_plaintext_len), 0);
         fprintf(stderr,"Interaction complete: Alice -> Bob\n");
-
+        char* content;
+        content = append(decryptedMsg, "");
+    free(decode_content_origal);
         SIGNAL_UNREF(alice_message_deserialized);
         signal_buffer_free(bob_plaintext);
         session_cipher_free(bob_cipher);
@@ -321,8 +326,7 @@ char* decryptMessage2(const char* encryptMsg ,const char* senderName, const char
         //SIGNAL_UNREF(alice_session_record);
         SIGNAL_UNREF(bob_session_record);
         signal_destroy(global_context);
-                
-                return decryptedMsg;
+        return content;
 }
 
 
@@ -501,7 +505,7 @@ char* base64_encode(char *src, size_t len) {
     }
 
 
-    unsigned char * base64_decode(const unsigned char *src, size_t len,
+    unsigned char* base64_decode(const unsigned char *src, size_t len,
                                   size_t *out_len)
                 {
                     unsigned char dtable[256], *out, *pos, block[4], tmp;
