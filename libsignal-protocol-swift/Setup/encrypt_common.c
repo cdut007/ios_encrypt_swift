@@ -112,7 +112,7 @@
   }
 
     
-    void encryptMsg2(const char* currentUser,const char* receiverName, char* orignalMsg){
+    char* encryptMsg2(const char* currentUser,const char* receiverName,const char* orignalMsg){
            signal_context* global_context = signal_setup2();
            fprintf(stderr, "encrypt msg\n");
 
@@ -174,7 +174,7 @@
 
              char * encrypt_chars = (char*)signal_buffer_data(alice_message_serialized);
              //content
-             char *  encoded = base64_encode(encrypt_chars);
+             char *  encoded = base64_encode(encrypt_chars,len);
 
              fprintf(stderr,"ciphertext_message_get_serialized content encoded:%s,len %d\n",encoded,len);
 
@@ -185,7 +185,7 @@
              char *  data = (char*)signal_buffer_data(buffer);
              size_t record_len = signal_buffer_len(buffer);
              //key for base64
-        char *  session_encoded = base64_encode(data);
+        char *  session_encoded = base64_encode(data,record_len);
              // session record
             fprintf(stderr,"ciphertext_message_get_serialized session_encoded encoded:%s,len %d\n",session_encoded,record_len);
              //change the position.
@@ -193,15 +193,17 @@
     //                      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     //         int random_len = sizeof(random_chars);
     //         int pos = rand()%random_len;
-        
-            orignalMsg = append(encoded, ".");
-            orignalMsg = append(orignalMsg, "q");
-            orignalMsg = append(orignalMsg, session_encoded);
-       
+            char* content;
+            content = append(encoded, ".");
+            content = append(content, "q");
+            content = append(content, session_encoded);
+         fprintf(stderr,"ciphertext_message_get_message Str:%s\n",content);
             /* Cleanup */
             SIGNAL_UNREF(alice_session_record);
             SIGNAL_UNREF(bob_session_record);
             signal_destroy(global_context);
+        
+        return content;
     }
 
     char* append(char *s1, char *s2)
@@ -425,44 +427,141 @@
     }
 
 
+static const unsigned char base64_table[65] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+/**
+ * base64_encode - Base64 encode
+ * @src: Data to be encoded
+ * @len: Length of the data to be encoded
+ * @out_len: Pointer to output length variable, or %NULL if not used
+ * Returns: Allocated buffer of out_len bytes of encoded data,
+ * or %NULL on failure
+ *
+ * Caller is responsible for freeing the returned buffer. Returned buffer is
+ * nul terminated to make it easier to use as a C string. The nul terminator is
+ * not included in out_len.
+ */
+//unsigned char * base64_encode(const unsigned char *src, size_t len,
+//                  size_t *out_len)
+//{
+//    unsigned char *out, *pos;
+//    const unsigned char *end, *in;
+//    size_t olen;
+//    int line_len;
+//
+//    olen = len * 4 / 3 + 4; /* 3-byte blocks to 4-byte */
+//    olen += olen / 72; /* line feeds */
+//    olen++; /* nul termination */
+//    if (olen < len)
+//        return NULL; /* integer overflow */
+//    out = malloc(olen);
+//    if (out == NULL)
+//        return NULL;
+//
+//    end = src + len;
+//    in = src;
+//    pos = out;
+//    line_len = 0;
+//    while (end - in >= 3) {
+//        *pos++ = base64_table[in[0] >> 2];
+//        *pos++ = base64_table[((in[0] & 0x03) << 4) | (in[1] >> 4)];
+//        *pos++ = base64_table[((in[1] & 0x0f) << 2) | (in[2] >> 6)];
+//        *pos++ = base64_table[in[2] & 0x3f];
+//        in += 3;
+//        line_len += 4;
+//        if (line_len >= 72) {
+//            *pos++ = '\n';
+//            line_len = 0;
+//        }
+//    }
+//
+//    if (end - in) {
+//        *pos++ = base64_table[in[0] >> 2];
+//        if (end - in == 1) {
+//            *pos++ = base64_table[(in[0] & 0x03) << 4];
+//            *pos++ = '=';
+//        } else {
+//            *pos++ = base64_table[((in[0] & 0x03) << 4) |
+//                          (in[1] >> 4)];
+//            *pos++ = base64_table[(in[1] & 0x0f) << 2];
+//        }
+//        *pos++ = '=';
+//        line_len += 4;
+//    }
+//
+//    if (line_len)
+//        *pos++ = '\n';
+//
+//    *pos = '\0';
+//    if (out_len)
+//        *out_len = pos - out;
+//    return out;
+//}
+
+
+
     char base46_map[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                          'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
                          'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
                          'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
 
-    char* base64_encode(char* plain) {
+char* base64_encode(char *src, size_t len) {
+    unsigned char *out, *pos;
+       const unsigned char *end, *in;
+    size_t *out_len = 0;
+       size_t olen;
+       int line_len;
 
-        char counts = 0;
-        char buffer[3];
-        char* cipher = malloc(strlen(plain) * 4 / 3 + 4);
-        int i = 0, c = 0;
+       olen = len * 4 / 3 + 4; /* 3-byte blocks to 4-byte */
+       olen += olen / 72; /* line feeds */
+       olen++; /* nul termination */
+       if (olen < len)
+           return NULL; /* integer overflow */
+       out = malloc(olen);
+       if (out == NULL)
+           return NULL;
 
-        for(i = 0; plain[i] != '\0'; i++) {
-            buffer[counts++] = plain[i];
-            if(counts == 3) {
-                cipher[c++] = base46_map[buffer[0] >> 2];
-                cipher[c++] = base46_map[((buffer[0] & 0x03) << 4) + (buffer[1] >> 4)];
-                cipher[c++] = base46_map[((buffer[1] & 0x0f) << 2) + (buffer[2] >> 6)];
-                cipher[c++] = base46_map[buffer[2] & 0x3f];
-                counts = 0;
-            }
-        }
+       end = src + len;
+       in = src;
+       pos = out;
+       line_len = 0;
+       while (end - in >= 3) {
+           *pos++ = base64_table[in[0] >> 2];
+           *pos++ = base64_table[((in[0] & 0x03) << 4) | (in[1] >> 4)];
+           *pos++ = base64_table[((in[1] & 0x0f) << 2) | (in[2] >> 6)];
+           *pos++ = base64_table[in[2] & 0x3f];
+           in += 3;
+           line_len += 4;
+           if (line_len >= 72) {
+               *pos++ = '\n';
+               line_len = 0;
+           }
+       }
 
-        if(counts > 0) {
-            cipher[c++] = base46_map[buffer[0] >> 2];
-            if(counts == 1) {
-                cipher[c++] = base46_map[(buffer[0] & 0x03) << 4];
-                cipher[c++] = '=';
-            } else {                      // if counts == 2
-                cipher[c++] = base46_map[((buffer[0] & 0x03) << 4) + (buffer[1] >> 4)];
-                cipher[c++] = base46_map[(buffer[1] & 0x0f) << 2];
-            }
-            cipher[c++] = '=';
-        }
+       if (end - in) {
+           *pos++ = base64_table[in[0] >> 2];
+           if (end - in == 1) {
+               *pos++ = base64_table[(in[0] & 0x03) << 4];
+               *pos++ = '=';
+           } else {
+               *pos++ = base64_table[((in[0] & 0x03) << 4) |
+                             (in[1] >> 4)];
+               *pos++ = base64_table[(in[1] & 0x0f) << 2];
+           }
+           *pos++ = '=';
+           line_len += 4;
+       }
 
-        cipher[c] = '\0';   /* string padding character */
-        return cipher;
+       if (line_len)
+           *pos++ = '\n';
+
+       *pos = '\0';
+       if (out_len)
+           *out_len = pos - out;
+       return out;
+        
     }
 
 
@@ -688,8 +787,9 @@
 
   
     
-    int sha512_digest_init2(void **digest_context, void *user_data)
+    int sha512_digest_init2(signal_buffer **output, const uint8_t *data, size_t data_len, void *user_data)
     {
+        void **digest_context = 0;
         int result = 0;
 
         CC_SHA512_CTX *ctx = malloc(sizeof(CC_SHA512_CTX));
@@ -713,6 +813,12 @@
         else {
             *digest_context = ctx;
         }
+        
+        sha512_digest_update2(*digest_context,data,data_len,user_data);
+        sha512_digest_final2(*digest_context,output,user_data);
+        sha512_digest_cleanup2(*digest_context, user_data);
+        
+        
         return result;
     }
 
@@ -935,10 +1041,7 @@
                 .hmac_sha256_update_func = hmac_sha256_update2,
                 .hmac_sha256_final_func = hmac_sha256_final2,
                 .hmac_sha256_cleanup_func = hmac_sha256_cleanup2,
-                 .sha512_digest_init_func = sha512_digest_init2,
-                 .sha512_digest_update_func = sha512_digest_update2,
-                 .sha512_digest_final_func = sha512_digest_final2,
-                 .sha512_digest_cleanup_func = sha512_digest_cleanup2,
+                 .sha512_digest_func = sha512_digest_init2,
                 .encrypt_func = whisper_encrypt2,
                 .decrypt_func = whisper_decrypt2,
                 .user_data = 0

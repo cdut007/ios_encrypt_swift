@@ -30,7 +30,7 @@ int hmac_sha256_init2(void **hmac_context, const uint8_t *key, size_t key_len, v
 int hmac_sha256_update2(void *hmac_context, const uint8_t *data, size_t data_len, void *user_data);
 int hmac_sha256_final2(void *hmac_context, signal_buffer **output, void *user_data);
 void hmac_sha256_cleanup2(void *hmac_context, void *user_data);
-int sha512_digest_init2(void **digest_context, void *user_data);
+int sha512_digest_init2(signal_buffer **output, const uint8_t *data, size_t data_len, void *user_data);
 int sha512_digest_update2(void *digest_context, const uint8_t *data, size_t data_len, void *user_data);
 int sha512_digest_final2(void *digest_context, signal_buffer **output, void *user_data);
 void sha512_digest_cleanup2(void *digest_context, void *user_data);
@@ -88,10 +88,10 @@ int sender_key_store_store_sender_key2(const signal_protocol_sender_key_name *se
 int sender_key_store_load_sender_key2(signal_buffer **record, const signal_protocol_sender_key_name *sender_key_name, void *user_data);
 void sender_key_store_destroy2(void *user_data);
 void setup_sender_key_store2(signal_protocol_store_context *context, signal_context *global_context);
-void encryptMsg2(const char* currentUser,const char* receiverName, char* orignalMsg);
+char* encryptMsg2(const char* currentUser,const char* receiverName, const char* orignalMsg);
 char* append(char *s1, char *s2);
 
-char* base64_encode(char* plain);
+char* base64_encode(char* plain,size_t len);
  char* base64_decode(char* cipher);
  void initialize_sessions_v3(session_state *alice_state, session_state *bob_state, signal_context *global_context);
 

@@ -11,8 +11,8 @@
 
 
 
-void encryptMsg(const char* currentUser,const char* receiverName, char* orignalMsg){
-    encryptMsg2(currentUser, receiverName, orignalMsg);
+char* encryptMsgMethod(const char* currentUser,const char* receiverName, const char* orignalMsg){
+   return encryptMsg2(currentUser, receiverName, orignalMsg);
 }
 
 

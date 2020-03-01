@@ -16,6 +16,6 @@
 
 
 
-void encryptMsg(const char* currentUser,const char* receiverName, char* orignalMsg);
+char* encryptMsgMethod(const char* currentUser,const char* receiverName, const char* orignalMsg);
 
 #endif /* setup_h */
