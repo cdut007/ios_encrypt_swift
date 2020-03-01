@@ -217,110 +217,113 @@
         return result;
     }
     
-//    void decryptMessage(const char* encryptMsg,int encryptMsgLen, const char* senderName,int senderNameLen){
-//          signal_context* global_context = signal_setup2();
-//          fprintf(stderr,"decrypt msg");
-//
-//            int result = 0;
-//
-//            /* Create Alice's session record */
-//             session_record *alice_session_record = 0;
-//            //  LOG(LS_INFO) << "session begin~~";
-//             result = session_record_create(&alice_session_record, 0, global_context);
-//            /* Create Bob's session record */
-//            session_record *bob_session_record = 0;
-//            result = session_record_create(&bob_session_record, 0, global_context);
-//            ////ck_assert_int_eq(result, 0);
-//
-//            initialize_sessions_v3(
-//                    session_record_get_state(alice_session_record),
-//                    session_record_get_state(bob_session_record),global_context);
-//
-//
-//                    char* decoded = encryptMsg;
-//                    fprintf(stderr,"decrypt alice_plain_content,decoded:%s",decoded);
-//    //                std::string decode_content,decode_key;
-//    //                int startPos = decoded.find(std::string("."));
-//    //                    if(startPos != std::string::npos){
-//    //                        int sessionStartPos = startPos+1;
-//    //                        int len = decoded.size();
-//    //                        int sessionLen = len - sessionStartPos;
-//    //                        int keyLen = startPos;
-//    //                          decode_key = decoded.substr(sessionStartPos,sessionLen);
-//    //                          //remove flag
-//    //                          decode_key = decode_key.substr(1,sessionLen-1);
-//    //
-//    //                          decode_content  = decoded.substr(0,keyLen);
-//    //
-//    //                    }
-//    //              fprintf(stderr,"find session decode_content:" << decode_content << "\n decode_key:" << decode_key;
-//    //                /* Deserialize the record */
-//    //                std::string decode_content_origal,decode_key_origal;
-//    //                decode_content_origal = base64_decode(decode_content);
-//    //                decode_key_origal = base64_decode(decode_key);
-//    //
-//    //                session_record *record_deserialized = 0;
-//    //                const char*  expr_session_record= decode_key_origal.c_str();
-//    //                uint8_t * data = (uint8_t *)expr_session_record;
-//    //
-//    //
-//    //                int len = decode_key_origal.size();
-//    //
-//    //                result = session_record_deserialize(&record_deserialized, data, len, global_context);
-//    //               fprintf(stderr,"find session decode_key_len :" << len;
-//    //                bob_session_record = record_deserialized;
-//    //
-//    //
-//    //        signal_protocol_address bob_address = {
-//    //                                senderName.c_str(), senderName.size(), 1
-//    //                        };
-//    //        /* Create the  data store */
-//    //        signal_protocol_store_context *bob_store = 0;
-//    //        setup_store_context2(&bob_store, global_context);
-//    //        /* Store the  session in their data store */
-//    //        result = signal_protocol_session_store_session(bob_store, &bob_address, bob_session_record);
-//    //        /* Create  session cipher instance */
-//    //        session_cipher *bob_cipher = 0;
-//    //        result = session_cipher_create(&bob_cipher, bob_store, &bob_address, global_context);
-//    //
-//    //
-//    //        int decryptlen = decode_content_origal.size();
-//    //        const char*  expr= decode_content_origal.c_str();
-//    //        uint8_t * message = (uint8_t *)expr;
-//    //        size_t alice_plain_content_len = decryptlen;
-//    //        fprintf(stderr," decrypt alice_plain_content_len,result:%d",alice_plain_content_len);
-//    //        signal_message *alice_message_deserialized = 0;
-//    //        result = signal_message_deserialize(&alice_message_deserialized,
-//    //                message,
-//    //                alice_plain_content_len,
-//    //                global_context);
-//    //        fprintf(stderr,"signal_message_deserialize,result:%d",result);
-//    //        /* Have Bob decrypt the test message */
-//    //        signal_buffer *bob_plaintext = 0;
-//    //        result = session_cipher_decrypt_signal_message(bob_cipher, alice_message_deserialized, 0, &bob_plaintext);
-//    //        ////ck_assert_int_eq(result, 0);
-//    //       fprintf(stderr,"session_cipher_decrypt_signal_message,result:%d",result);
-//    //
-//    //        uint8_t *bob_plaintext_data = signal_buffer_data(bob_plaintext);
-//    //        size_t bob_plaintext_len = signal_buffer_len(bob_plaintext);
-//    //
-//    //        /* in case you'd expect char buffer, just a byte to byte copy */
-//    //        std::string decrypt_info((char*)bob_plaintext_data, bob_plaintext_len);
-//    //        encryptMsg = decrypt_info;
-//    //        fprintf(stderr,"session_cipher_decrypt_signal_message,content"<<encryptMsg;
-//    //        //ck_assert_int_eq(memcmp(alice_plaintext, bob_plaintext_data, bob_plaintext_len), 0);
-//    //        fprintf(stderr,"Interaction complete: Alice -> Bob\n");
-//    //
-//    //        SIGNAL_UNREF(alice_message_deserialized);
-//    //        signal_buffer_free(bob_plaintext);
-//    //        session_cipher_free(bob_cipher);
-//    //        signal_protocol_store_context_destroy(bob_store);
-//    //        /* Cleanup */
-//    //        //SIGNAL_UNREF(alice_session_record);
-//    //        SIGNAL_UNREF(bob_session_record);
-//    //        signal_destroy(global_context);
-//    }
 
+char* decryptMessage2(const char* encryptMsg ,const char* senderName, const char* decode_content,const char* decode_key){
+      signal_context* global_context = signal_setup2();
+      fprintf(stderr,"decrypt msg");
+
+        int result = 0;
+
+        /* Create Alice's session record */
+         session_record *alice_session_record = 0;
+        //  LOG(LS_INFO) << "session begin~~";
+         result = session_record_create(&alice_session_record, 0, global_context);
+        /* Create Bob's session record */
+        session_record *bob_session_record = 0;
+        result = session_record_create(&bob_session_record, 0, global_context);
+        ////ck_assert_int_eq(result, 0);
+
+        initialize_sessions_v3(
+                session_record_get_state(alice_session_record),
+                session_record_get_state(bob_session_record),global_context);
+
+
+                char* decoded = encryptMsg;
+                fprintf(stderr,"decrypt alice_plain_content,decoded:%s",decoded);
+               
+                
+//                int startPos = decoded.find(std::string("."));
+//                    if(startPos != std::string::npos){
+//                        int sessionStartPos = startPos+1;
+//                        int len = decoded.size();
+//                        int sessionLen = len - sessionStartPos;
+//                        int keyLen = startPos;
+//                          decode_key = decoded.substr(sessionStartPos,sessionLen);
+//                          //remove flag
+//                          decode_key = decode_key.substr(1,sessionLen-1);
+//
+//                          decode_content  = decoded.substr(0,keyLen);
+//
+//                    }
+              fprintf(stderr,"find session decode_content:%s decode_key:%s\n",decode_content, decode_key);
+                /* Deserialize the record */
+                char*  decode_content_origal,decode_key_origal;
+                size_t orgLen=0,keyLen=0;
+                size_t decode_content_len = strlen(decode_content),decode_key_len=strlen(decode_key);
+                decode_content_origal = base64_decode(decode_content,decode_content_len,&orgLen);
+                decode_key_origal = base64_decode(decode_key,decode_key_len,&keyLen);
+
+                session_record *record_deserialized = 0;
+                const char*  expr_session_record= decode_content;
+                uint8_t * data = (uint8_t *)expr_session_record;
+
+
+                result = session_record_deserialize(&record_deserialized, data, keyLen, global_context);
+               fprintf(stderr,"find session org_key_len:%d , decode_key_len :%d ,result:%d\n" ,decode_key_len,keyLen,result);
+                bob_session_record = record_deserialized;
+
+
+        signal_protocol_address bob_address = {
+                                senderName, strlen(senderName), 1
+                        };
+        /* Create the  data store */
+        signal_protocol_store_context *bob_store = 0;
+        setup_store_context2(&bob_store, global_context);
+        fprintf(stderr,"begin signal_protocol_session_store_session\n");
+        /* Store the  session in their data store */
+        result = signal_protocol_session_store_session(bob_store, &bob_address, bob_session_record);
+        /* Create  session cipher instance */
+        session_cipher *bob_cipher = 0;
+        result = session_cipher_create(&bob_cipher, bob_store, &bob_address, global_context);
+
+
+        int decryptlen = orgLen;
+        const char*  expr= decode_content_origal;
+        uint8_t * message = (uint8_t *)expr;
+        size_t alice_plain_content_len = decryptlen;
+        fprintf(stderr," decrypt alice_plain_content_len,result:%d",alice_plain_content_len);
+        signal_message *alice_message_deserialized = 0;
+        result = signal_message_deserialize(&alice_message_deserialized,
+                message,
+                alice_plain_content_len,
+                global_context);
+        fprintf(stderr,"signal_message_deserialize,result:%d",result);
+        /* Have Bob decrypt the test message */
+        signal_buffer *bob_plaintext = 0;
+        result = session_cipher_decrypt_signal_message(bob_cipher, alice_message_deserialized, 0, &bob_plaintext);
+        ////ck_assert_int_eq(result, 0);
+       fprintf(stderr,"session_cipher_decrypt_signal_message,result:%d",result);
+
+        uint8_t *bob_plaintext_data = signal_buffer_data(bob_plaintext);
+        size_t bob_plaintext_len = signal_buffer_len(bob_plaintext);
+
+        /* in case you'd expect char buffer, just a byte to byte copy */
+    char* decryptedMsg = (char*)bob_plaintext_data;
+        fprintf(stderr,"session_cipher_decrypt_signal_message,content,%s",decryptedMsg);
+        //ck_assert_int_eq(memcmp(alice_plaintext, bob_plaintext_data, bob_plaintext_len), 0);
+        fprintf(stderr,"Interaction complete: Alice -> Bob\n");
+
+        SIGNAL_UNREF(alice_message_deserialized);
+        signal_buffer_free(bob_plaintext);
+        session_cipher_free(bob_cipher);
+        signal_protocol_store_context_destroy(bob_store);
+        /* Cleanup */
+        //SIGNAL_UNREF(alice_session_record);
+        SIGNAL_UNREF(bob_session_record);
+        signal_destroy(global_context);
+                
+                return decryptedMsg;
+}
 
 
 
@@ -430,74 +433,7 @@
 static const unsigned char base64_table[65] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-/**
- * base64_encode - Base64 encode
- * @src: Data to be encoded
- * @len: Length of the data to be encoded
- * @out_len: Pointer to output length variable, or %NULL if not used
- * Returns: Allocated buffer of out_len bytes of encoded data,
- * or %NULL on failure
- *
- * Caller is responsible for freeing the returned buffer. Returned buffer is
- * nul terminated to make it easier to use as a C string. The nul terminator is
- * not included in out_len.
- */
-//unsigned char * base64_encode(const unsigned char *src, size_t len,
-//                  size_t *out_len)
-//{
-//    unsigned char *out, *pos;
-//    const unsigned char *end, *in;
-//    size_t olen;
-//    int line_len;
-//
-//    olen = len * 4 / 3 + 4; /* 3-byte blocks to 4-byte */
-//    olen += olen / 72; /* line feeds */
-//    olen++; /* nul termination */
-//    if (olen < len)
-//        return NULL; /* integer overflow */
-//    out = malloc(olen);
-//    if (out == NULL)
-//        return NULL;
-//
-//    end = src + len;
-//    in = src;
-//    pos = out;
-//    line_len = 0;
-//    while (end - in >= 3) {
-//        *pos++ = base64_table[in[0] >> 2];
-//        *pos++ = base64_table[((in[0] & 0x03) << 4) | (in[1] >> 4)];
-//        *pos++ = base64_table[((in[1] & 0x0f) << 2) | (in[2] >> 6)];
-//        *pos++ = base64_table[in[2] & 0x3f];
-//        in += 3;
-//        line_len += 4;
-//        if (line_len >= 72) {
-//            *pos++ = '\n';
-//            line_len = 0;
-//        }
-//    }
-//
-//    if (end - in) {
-//        *pos++ = base64_table[in[0] >> 2];
-//        if (end - in == 1) {
-//            *pos++ = base64_table[(in[0] & 0x03) << 4];
-//            *pos++ = '=';
-//        } else {
-//            *pos++ = base64_table[((in[0] & 0x03) << 4) |
-//                          (in[1] >> 4)];
-//            *pos++ = base64_table[(in[1] & 0x0f) << 2];
-//        }
-//        *pos++ = '=';
-//        line_len += 4;
-//    }
-//
-//    if (line_len)
-//        *pos++ = '\n';
-//
-//    *pos = '\0';
-//    if (out_len)
-//        *out_len = pos - out;
-//    return out;
-//}
+
 
 
 
@@ -565,30 +501,68 @@ char* base64_encode(char *src, size_t len) {
     }
 
 
-    char* base64_decode(char* cipher) {
+    unsigned char * base64_decode(const unsigned char *src, size_t len,
+                                  size_t *out_len)
+                {
+                    unsigned char dtable[256], *out, *pos, block[4], tmp;
+                    size_t i, count, olen;
+                    int pad = 0;
 
-        char counts = 0;
-        char buffer[4];
-        char* plain = malloc(strlen(cipher) * 3 / 4);
-        int i = 0, p = 0;
+                    memset(dtable, 0x80, 256);
+                    for (i = 0; i < sizeof(base64_table) - 1; i++)
+                        dtable[base64_table[i]] = (unsigned char) i;
+                    dtable['='] = 0;
 
-        for(i = 0; cipher[i] != '\0'; i++) {
-            char k;
-            for(k = 0 ; k < 64 && base46_map[k] != cipher[i]; k++);
-            buffer[counts++] = k;
-            if(counts == 4) {
-                plain[p++] = (buffer[0] << 2) + (buffer[1] >> 4);
-                if(buffer[2] != 64)
-                    plain[p++] = (buffer[1] << 4) + (buffer[2] >> 2);
-                if(buffer[3] != 64)
-                    plain[p++] = (buffer[2] << 6) + buffer[3];
-                counts = 0;
-            }
-        }
+                    count = 0;
+                    for (i = 0; i < len; i++) {
+                        if (dtable[src[i]] != 0x80)
+                            count++;
+                    }
 
-        plain[p] = '\0';    /* string padding character */
-        return plain;
-    }
+                    if (count == 0 || count % 4)
+                        return NULL;
+
+                    olen = count / 4 * 3;
+                    pos = out = malloc(olen);
+                    if (out == NULL)
+                        return NULL;
+
+                    count = 0;
+                    for (i = 0; i < len; i++) {
+                        tmp = dtable[src[i]];
+                        if (tmp == 0x80)
+                            continue;
+
+                        if (src[i] == '=')
+                            pad++;
+                        block[count] = tmp;
+                        count++;
+                        if (count == 4) {
+                            *pos++ = (block[0] << 2) | (block[1] >> 4);
+                            *pos++ = (block[1] << 4) | (block[2] >> 2);
+                            *pos++ = (block[2] << 6) | block[3];
+                            count = 0;
+                            if (pad) {
+                                if (pad == 1)
+                                    pos--;
+                                else if (pad == 2)
+                                    pos -= 2;
+                                else {
+                                    /* Invalid padding */
+                                    free(out);
+                                    return NULL;
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    *out_len = pos - out;
+                    return out;
+                }
+    
+                
+
 
     
     

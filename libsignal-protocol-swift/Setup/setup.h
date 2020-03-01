@@ -17,5 +17,6 @@
 
 
 char* encryptMsgMethod(const char* currentUser,const char* receiverName, const char* orignalMsg);
+char* decryptMsgMethod(const char* encryptMsg,const char* senderName,const char* decode_content,const char* decode_key);
 
 #endif /* setup_h */

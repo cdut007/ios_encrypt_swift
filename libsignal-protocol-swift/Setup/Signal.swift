@@ -64,6 +64,21 @@ public extension Signal {
         return encryptedMsg
       }
     
+    static func decryptMessage(encryptMsg:String,senderName:String) -> String{
+    
+        let index = encryptMsg.range(of: ".")!.lowerBound;
+        let decode_msg_content  = String(encryptMsg[..<index]);
+        let pos = index.utf16Offset(in: encryptMsg)+2;
+        let decode_session_key  = String(encryptMsg.suffix(encryptMsg.count-pos));
+
+            let info = SignalProtocol.decryptMsgMethod(convertUtf8Str(encryptMsg),convertUtf8Str(senderName),convertUtf8Str(decode_msg_content),convertUtf8Str(decode_session_key))
+            let decryptMsg =  String(cString: info!)
+           print("\(decryptMsg)")
+           
+           return decryptMsg
+         }
+       
+    
     
    
 }
